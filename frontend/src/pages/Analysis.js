@@ -22,6 +22,18 @@ function Analysis() {
           body: formData,
         });
 
+        if (!response.ok) {
+          if (response.status === 500) {
+            throw new Error(
+              "Failed to parse PDF. The file may be corrupted or not readable."
+            );
+          } else if (response.status === 400) {
+            throw new Error("No PDF file uploaded. Please try again.");
+          } else {
+            throw new Error("An error occurred while processing the PDF.");
+          }
+        }
+
         const data = await response.json();
         if (data.error) {
           throw new Error(data.error);
@@ -34,7 +46,13 @@ function Analysis() {
       }
     } catch (error) {
       console.error("Error processing file:", error);
-      setResumeText("Error reading the file. Please try again.");
+      if (error.message.includes("Failed to fetch")) {
+        setResumeText(
+          "Error: Backend server is not running. Please start the backend and try again."
+        );
+      } else {
+        setResumeText(`Error: ${error.message}`);
+      }
     }
   };
 
@@ -64,7 +82,7 @@ function Analysis() {
           </h2>
           <div
             {...getRootProps()}
-            className="border-2 border-dashed border-gray-300 p-6 rounded-lg text-center hover:border-blue-500 transition"
+            className="border-2 border-dashed border-gray-300 p-6 rounded-lg text-center hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"
           >
             <input {...getInputProps()} />
             <p className="text-gray-600">
@@ -89,7 +107,7 @@ function Analysis() {
             Enter Job Description
           </h2>
           <textarea
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="w-full p-3 sm:p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             rows="6"
             placeholder="Paste the job description here..."
             value={jobDescription}
