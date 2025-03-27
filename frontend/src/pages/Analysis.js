@@ -7,6 +7,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.mjs";
 
 function Analysis() {
   const [resumeText, setResumeText] = useState("");
+  const [jobDescription, setJobDescription] = useState("");
 
   const onDrop = async (acceptedFiles) => {
     const file = acceptedFiles[0];
@@ -59,11 +60,32 @@ function Analysis() {
 
   return (
     <div className="p-4">
-      <div {...getRootProps()} className="border-2 border-dashed p-4">
+      <h2 className="text-2xl mb-4">Upload Your Resume</h2>
+      <div {...getRootProps()} className="border-2 border-dashed p-4 mb-4">
         <input {...getInputProps()} />
         <p>Drag & drop a resume (.txt or .pdf), or click to select</p>
       </div>
-      {resumeText && <pre className="mt-4">{resumeText}</pre>}
+      {resumeText && (
+        <div className="mb-4">
+          <h3 className="text-xl">Resume Content:</h3>
+          <pre className="mt-2 p-2 bg-gray-100">{resumeText}</pre>
+        </div>
+      )}
+
+      <h2 className="text-2xl mb-4">Enter Job Description</h2>
+      <textarea
+        className="w-full p-2 border rounded"
+        rows="6"
+        placeholder="Paste the job description here..."
+        value={jobDescription}
+        onChange={(e) => setJobDescription(e.target.value)}
+      />
+      {jobDescription && (
+        <div className="mt-4">
+          <h3 className="text-xl">Job Description:</h3>
+          <pre className="mt-2 p-2 bg-gray-100">{jobDescription}</pre>
+        </div>
+      )}
     </div>
   );
 }
