@@ -1,9 +1,5 @@
 import { useDropzone } from "react-dropzone";
 import { useState } from "react";
-import * as pdfjsLib from "pdfjs-dist";
-
-// Set the worker script URL to the public folder
-pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.mjs";
 
 function Analysis() {
   const [resumeText, setResumeText] = useState("");
@@ -15,30 +11,25 @@ function Analysis() {
 
     try {
       if (file.type === "text/plain") {
-        // Handle .txt files
+        // Handle .txt files locally
         const text = await file.text();
         setResumeText(text);
       } else if (file.type === "application/pdf") {
-        // Handle .pdf files
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          const typedArray = new Uint8Array(e.target.result);
-          const pdf = await pdfjsLib.getDocument(typedArray).promise;
-          let extractedText = "";
+        // Send .pdf files to the backend
+        const formData = new FormData();
+        formData.append("pdfFile", file);
 
-          // Loop through each page of the PDF
-          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-            const page = await pdf.getPage(pageNum);
-            const textContent = await page.getTextContent();
-            const pageText = textContent.items
-              .map((item) => item.str)
-              .join(" ");
-            extractedText += pageText + "\n";
-          }
+        const response = await fetch("http://localhost:5001/parse-pdf", {
+          // Changed to 5001
+          method: "POST",
+          body: formData,
+        });
 
-          setResumeText(extractedText);
-        };
-        reader.readAsArrayBuffer(file);
+        const data = await response.json();
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        setResumeText(data.text);
       } else {
         setResumeText(
           "Unsupported file type. Please upload a .txt or .pdf file."
