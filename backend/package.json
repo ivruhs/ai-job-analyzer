@@ -14,8 +14,11 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-fileupload": "^1.5.1",
+    "morgan": "^1.10.0",
     "openai": "^4.89.1",
-    "pdf2json": "^3.1.5"
+    "pdf-to-img": "^4.4.0",
+    "pdf2json": "^3.1.5",
+    "pdf2pic": "^3.1.4"
   },
   "description": ""
 }
